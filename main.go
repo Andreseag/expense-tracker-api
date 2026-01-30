@@ -31,6 +31,7 @@ func main() {
   // r.GET("/api/tasks", controllers.GetTasks)
 	// r.POST("/api/tasks/new", controllers.CreateTask)
 	r.GET("/api/expenses", controllers.GetExpenses)
+	r.POST("/api/expenses/new", controllers.CreateExpense)
 	
 	// // ¡Aquí está lo que pediste! El :id es el parámetro
 	// r.PUT("/api/tasks/:id", controllers.UpdateTask)
