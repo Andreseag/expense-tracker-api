@@ -4,7 +4,9 @@ import (
 	"time"
 
 	"github.com/Andreseag/expense-tracker-api/config"
+	"github.com/Andreseag/expense-tracker-api/controllers"
 	"github.com/gin-contrib/cors"
+
 	// "github.com/Andreseag/expense-tracker-api/controllers"
 	"github.com/Andreseag/expense-tracker-api/models"
 	"github.com/gin-gonic/gin"
@@ -13,7 +15,7 @@ import (
 
 func main() {
 	config.ConectarDB()
-	config.DB.AutoMigrate(&models.Expens{})
+	config.DB.AutoMigrate(&models.Expense{})
 
 	r := gin.Default()
 
@@ -28,6 +30,7 @@ func main() {
 	// // Envolvemos las rutas con el middleware
   // r.GET("/api/tasks", controllers.GetTasks)
 	// r.POST("/api/tasks/new", controllers.CreateTask)
+	r.GET("/api/expenses", controllers.GetExpenses)
 	
 	// // ¡Aquí está lo que pediste! El :id es el parámetro
 	// r.PUT("/api/tasks/:id", controllers.UpdateTask)
