@@ -26,44 +26,33 @@ func CreateExpense(c *gin.Context) {
 	}
 
 	// VALIDACIÓN
-
 	if t.Amount <= 0 || t.Description == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": "Descripción obligatoria y monto debe ser mayor a 0"})
 		return
 	}
 	
-	// if t.Status != models.StatusTodo && 
-	//    t.Status != models.StatusInProgress && 
-	//    t.Status != models.StatusDone {
-	// 	if t.Status == "" {
-	// 		t.Status = models.StatusTodo
-	// 	} else {
-	// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Estado no válido"})
-	// 		return
-	// 	}
-	// }
 	
 	config.DB.Create(&t)
 	c.JSON(http.StatusCreated, t)
 }
 
-// func UpdateTask(c *gin.Context) {
-// 	id := c.Param("id") 
+func UpdateExpense(c *gin.Context) {
+	id := c.Param("id") 
 	
-// 	var task models.Task
-// 	if err := config.DB.First(&task, id).Error; err != nil {
-// 		c.JSON(http.StatusNotFound, gin.H{"error": "Tarea no encontrada"})
-// 		return
-// 	}
+	var expense models.Expense
+	if err := config.DB.First(&expense, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Tarea no encontrada"})
+		return
+	}	
 
-// 	if err := c.ShouldBindJSON(&task); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
-// 		return
-// 	}
+	if err := c.ShouldBindJSON(&expense); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		return
+	}
 
-// 	config.DB.Save(&task)
-// 	c.JSON(http.StatusOK, task)
-// }
+	config.DB.Save(&expense)
+	c.JSON(http.StatusOK, expense)
+}
 
 // func DeleteTask(c *gin.Context) {
 // 	id := c.Param("id")

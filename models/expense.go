@@ -7,6 +7,6 @@ import "gorm.io/gorm"
 
 type Expense struct {
 	gorm.Model
-	Description string `json:"description"`
-	Amount      float32 `json:"amount"`
+	Description string `json:"description" binding:"required"`
+	Amount      float32 `json:"amount" binding:"required"`
 }
