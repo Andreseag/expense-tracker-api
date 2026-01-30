@@ -54,18 +54,34 @@ func UpdateExpense(c *gin.Context) {
 	c.JSON(http.StatusOK, expense)
 }
 
-// func DeleteTask(c *gin.Context) {
-// 	id := c.Param("id")
+func DeleteTask(c *gin.Context) {
+	id := c.Param("id")
 
-// 	var task models.Task
-// 	if err := config.DB.First(&task, id).Error; err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Tarea no encontrada"})
-// 	}
+	var expense models.Expense
+	if err := config.DB.First(&expense, id).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Expense no encontrado"})
+	}
 
-// 	if err := c.ShouldBindJSON(&task); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
-// 	}
+	if err := c.ShouldBindJSON(&expense); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+	}
 
-// 	config.DB.Delete(&task)
+	config.DB.Delete(&expense)
 
-// }
+} 
+
+func GetSummary(c *gin.Context) {
+	var summary float64
+
+	// GORM ejecutará: SELECT SUM(amount) FROM expenses WHERE deleted_at IS NULL
+	err := config.DB.Model(&models.Expense{}).Select("SUM(amount)").Row().Scan(&summary)
+
+	if err != nil {
+			// Si la tabla está vacía, Scan podría dar error o devolver 0
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo calcular el total"})
+			return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"total": summary})
+
+}

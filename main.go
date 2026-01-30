@@ -7,7 +7,6 @@ import (
 	"github.com/Andreseag/expense-tracker-api/controllers"
 	"github.com/gin-contrib/cors"
 
-	// "github.com/Andreseag/expense-tracker-api/controllers"
 	"github.com/Andreseag/expense-tracker-api/models"
 	"github.com/gin-gonic/gin"
 )
@@ -27,16 +26,12 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
  
-	// // Envolvemos las rutas con el middleware
-  // r.GET("/api/tasks", controllers.GetTasks)
-	// r.POST("/api/tasks/new", controllers.CreateTask)
+	// Requests
 	r.GET("/api/expenses", controllers.GetExpenses)
 	r.POST("/api/expenses/new", controllers.CreateExpense)
 	r.PUT("/api/expenses/:id", controllers.UpdateExpense)
-	
-	// // ¡Aquí está lo que pediste! El :id es el parámetro
-	// r.PUT("/api/tasks/:id", controllers.UpdateTask)
-	// r.DELETE("/api/tasks/:id", controllers.DeleteTask) 
+	r.GET("/api/expenses/summary", controllers.GetSummary) 
+
 
 	r.Run(":8080")
 }
