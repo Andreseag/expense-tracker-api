@@ -72,16 +72,35 @@ func DeleteTask(c *gin.Context) {
 
 func GetSummary(c *gin.Context) {
 	var summary float64
-
+	month := c.Query("month")
+	months := map[string]string{
+		"1": "enero", "2": "febrero", "3": "marzo", "4": "abril",
+		"5": "mayo", "6": "junio", "7": "julio", "8": "agosto",
+		"9": "septiembre", "10": "octubre", "11": "noviembre", "12": "diciembre",
+	}
 	// GORM ejecutará: SELECT SUM(amount) FROM expenses WHERE deleted_at IS NULL
-	err := config.DB.Model(&models.Expense{}).Select("SUM(amount)").Row().Scan(&summary)
+	query := config.DB.Model(&models.Expense{}).Select("COALESCE(SUM(amount), 0)")
 
-	if err != nil {
-			// Si la tabla está vacía, Scan podría dar error o devolver 0
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo calcular el total"})
-			return
+	if month != "" {
+		// PostgreSQL: EXTRACT(MONTH FROM created_at)
+		query = query.Where("EXTRACT(MONTH FROM created_at) = ?", month)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"total": summary})
+	err := query.Row().Scan(&summary)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al calcular el resumen"})
+		return
+	}
+
+	monthName := "Todos los meses"
+	if val, ok := months[month]; ok {
+		monthName = val
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"month": monthName,
+		"total": summary,
+	})
 
 }
