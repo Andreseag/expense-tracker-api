@@ -54,7 +54,7 @@ func UpdateExpense(c *gin.Context) {
 	c.JSON(http.StatusOK, expense)
 }
 
-func DeleteTask(c *gin.Context) {
+func DeleteExpense(c *gin.Context) {
 	id := c.Param("id")
 
 	var expense models.Expense
@@ -62,12 +62,9 @@ func DeleteTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Expense no encontrado"})
 	}
 
-	if err := c.ShouldBindJSON(&expense); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
-	}
 
 	config.DB.Delete(&expense)
-
+  c.JSON(http.StatusOK, expense)
 } 
 
 func GetSummary(c *gin.Context) {

@@ -31,6 +31,7 @@ func main() {
 	r.POST("/api/expenses/new", controllers.CreateExpense)
 	r.PUT("/api/expenses/:id", controllers.UpdateExpense)
 	r.GET("/api/expenses/summary", controllers.GetSummary) 
+	r.DELETE("/api/expenses/:id", controllers.DeleteExpense)
 
 
 	r.Run(":8080")
