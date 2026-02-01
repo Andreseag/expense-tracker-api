@@ -32,6 +32,7 @@ func main() {
 	r.PUT("/api/expenses/:id", controllers.UpdateExpense)
 	r.GET("/api/expenses/summary", controllers.GetSummary) 
 	r.DELETE("/api/expenses/:id", controllers.DeleteExpense)
+	r.GET("/api/expenses/export", controllers.ExportExpensesCSV)
 
 
 	r.Run(":8080")

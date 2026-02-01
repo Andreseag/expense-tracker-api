@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/csv"
+	"fmt"
 	"net/http"
 
 	"github.com/Andreseag/expense-tracker-api/config"
@@ -101,3 +103,37 @@ func GetSummary(c *gin.Context) {
 	})
 
 }
+
+func ExportExpensesCSV(c *gin.Context) {
+	var expenses []models.Expense
+	// Traemos todos los gastos
+	config.DB.Find(&expenses)
+
+	// 1. Configuramos los Headers para la descarga
+	c.Header("Content-Disposition", "attachment; filename=gastos.csv")
+	c.Header("Content-Type", "text/csv")
+	c.Header("Transfer-Encoding", "chunked")
+
+	// 2. Creamos el escritor de CSV que apunta directamente al body de la respuesta
+	writer := csv.NewWriter(c.Writer)
+	defer writer.Flush()
+
+	// 3. Escribimos la cabecera (los títulos de las columnas)
+	header := []string{"ID", "Descripcion", "Monto", "Fecha"}
+	if err := writer.Write(header); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear el archivo"})
+		return
+	}
+
+	// 4. Recorremos los gastos y los escribimos en el CSV
+	for _, e := range expenses {
+		row := []string{
+			fmt.Sprintf("%d", e.ID),
+			e.Description,
+			fmt.Sprintf("%.2f", e.Amount),
+			e.CreatedAt.Format("2006-01-02 15:04:05"), // Formato de fecha legible
+		}
+		writer.Write(row)
+	}
+}
+
