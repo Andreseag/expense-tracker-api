@@ -10,9 +10,39 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Función auxiliar para validar
+func isValidCategory(cat string) bool {
+	switch cat {
+	case models.CatComida, models.CatTransporte, models.CatOcio, models.CatServicios, models.CatGeneral:
+		return true
+	}
+	return false
+}
+
 func GetExpenses(c *gin.Context) {
 	var expenses []models.Expense
 	config.DB.Order("created_at desc").Find(&expenses)
+	
+	// Filters
+	category := c.Query("category")
+
+	query := config.DB.Order("created_at desc")
+
+	if category != "" {
+		// 1. Validar si la categoría existe en nuestra lista permitida
+		if !isValidCategory(category) {
+			// Opción A: Devolver error 400 (Bad Request)
+			c.JSON(http.StatusBadRequest, gin.H{"error": "La categoría solicitada no existe"})
+			return
+		}
+		// 2. Si es válida, filtramos
+		query = query.Where("category = ?", category)
+	}
+
+	if err := query.Find(&expenses).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al obtener los gastos"})
+		return
+	}
 	
 	// Gin se encarga de los headers y de convertir a JSON
 	c.JSON(http.StatusOK, expenses)
