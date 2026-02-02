@@ -19,23 +19,28 @@ func GetExpenses(c *gin.Context) {
 }
 
 func CreateExpense(c *gin.Context) {
-	var t models.Expense
-	
-	// ShouldBindJSON es el equivalente a Decode
-	if err := c.ShouldBindJSON(&t); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+	var exp models.Expense
+
+	if err := c.ShouldBindJSON(&exp); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos o incompletos"})
 		return
 	}
 
-	// VALIDACIÓN
-	if t.Amount <= 0 || t.Description == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"Error": "Descripción obligatoria y monto debe ser mayor a 0"})
+	// VALIDACIÓN DE CATEGORÍA
+	switch exp.Category {
+	case models.CatComida, models.CatTransporte, models.CatOcio, models.CatServicios, models.CatGeneral:
+		// Es válida, no hacemos nada
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Categoría no permitida"})
 		return
 	}
-	
-	
-	config.DB.Create(&t)
-	c.JSON(http.StatusCreated, t)
+
+	if err := config.DB.Create(&exp).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo guardar el gasto"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, exp)
 }
 
 func UpdateExpense(c *gin.Context) {
